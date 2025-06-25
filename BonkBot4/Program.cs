@@ -13,10 +13,8 @@ using Serilog;
 using Serilog.Events;
 
 //TODO
-//Upgrade to latest discord.net version, test
-//debug info from logger shows outdated socetguilduser info, e.g.  ?murderface6466?#0000
-//unsure if expected or due to discord.net version being outdated with big discord api changes, though
-//bot still works as expected
+//
+//
 namespace BonkBot4
 {
     internal class Program
