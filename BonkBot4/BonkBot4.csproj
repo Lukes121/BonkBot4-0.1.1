@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <UserSecretsId>9e3c69ea-ea2f-4f15-baea-d2f71cd89cf2</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\.gitignore" Link=".gitignore">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Discord.Addons.Hosting" />
+    <PackageReference Include="Discord.Net" />
+    <PackageReference Include="Discord.Net.Commands" />
+    <PackageReference Include="Discord.Net.Core" />
+    <PackageReference Include="Discord.Net.WebSocket" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.dev.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
