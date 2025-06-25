@@ -9,6 +9,8 @@ using Discord.Addons.Hosting;
 using Discord.Commands;
 using BonkBot4.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Events;
 
 //TODO
 //Upgrade to latest discord.net version, test
@@ -21,8 +23,68 @@ namespace BonkBot4
     {
         static async Task Main()
         {
+            //New methods, and revised call stack for discord.net; microsoft.extensions.hosting; etc upgrades
+
+            //Serilog configuration; requires Serilog, Serilog.Sinks.Console
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug() //consider changing this to 'information()'
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+                .WriteTo.Console()
+                .CreateLogger();
+
+            //var config = new HostApplicationBuilderSettings()
+            var builder = Host.CreateApplicationBuilder();
+            //Here is where we change the json file being used
+            builder.Configuration.AddJsonFile("appsettings.dev.json", optional: false, reloadOnChange: true);
+            
+            //add logging
+            //requires serilog.extensions.hosting
+            builder.Services.AddSerilog();
+
+            builder.Services.AddDiscordHost((config, _) =>
+            {
+                config.SocketConfig = new DiscordSocketConfig
+                {
+                    LogLevel = Discord.LogSeverity.Verbose,
+                    AlwaysDownloadUsers = false,
+                    MessageCacheSize = 200,
+                    GatewayIntents = Discord.GatewayIntents.All //This is a new member of the discord API. Double check required intents configured in bot on discord
+                };
+
+                config.Token = builder.Configuration["Token"]!;
+
+                //Use this to configure a custom format for Client/CommandService logging if needed. The default is below and should be suitable for Serilog usage
+                config.LogFormat = (message, exception) => $"{message.Source}: {message.Message}";
+            });
+
+            builder.Services.AddCommandService((config, _) =>
+            {
+                config.DefaultRunMode = RunMode.Async;
+                config.CaseSensitiveCommands = false;
+                
+            });
+
+            builder.Services.AddInteractionService((config, _) =>
+            {
+                config.LogLevel = Discord.LogSeverity.Verbose; //consider changing to .info
+                config.UseCompiledLambda = true; //?
+            });
+
+            //Add each service to the builder
+            //May need to change to InteractionService if <CommandService> is deprecated. 
+            //Review what Interaction Service can do that CommandService cannot
+            builder.Services.AddHostedService<CommandHandler>();
+
+            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+            //Below is the old program flow with discord.net v2, and hostbuilder.
+            //The Hostbuilder has been partially replaced with new hosting methods, and the below code is left for reference.
+
             //HostBuilder assigns KV pairs for access to our config file [appsettings.json]
-            var builder = new HostBuilder()
+
+            /*
+
+            var builder1 = new HostBuilder()
                 .ConfigureAppConfiguration(x =>
                 {
                     var config = new ConfigurationBuilder()
@@ -37,11 +99,8 @@ namespace BonkBot4
                     x.AddConsole();
                     x.SetMinimumLevel(LogLevel.Debug);
                 })
-                //Original template included a type declaration, <DiscordSocketClient> however it has been removed below
-                //My theory is that it is expected to return that type, per the desc of the mthd, and is implicit in this [newer than template used] version of packs
-
-                //Necessary to configure the bot to do things like it's default logging, and perhaps most importantly,
-                //Message cache size for working with messages/caching messages from channels
+                
+                // /*
                 .ConfigureDiscordHost((context, config) =>
                 {
                     config.SocketConfig = new DiscordSocketConfig
@@ -58,20 +117,27 @@ namespace BonkBot4
                     config.LogLevel = Discord.LogSeverity.Debug;
                     config.DefaultRunMode = RunMode.Sync;
                 })
-                //Our DI Container
+               
+                //Our DI Container               
                 .ConfigureServices((context, services) =>
                 {
                     services
                         .AddHostedService<CommandHandler>();
                 })
                 .UseConsoleLifetime();
+            
 
             var host = builder.Build();
             using (host)
             {  
                 await host.RunAsync();
             }
+            */
+            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+            var host = builder.Build();
+
+            await host.RunAsync();
 
         }
     }
