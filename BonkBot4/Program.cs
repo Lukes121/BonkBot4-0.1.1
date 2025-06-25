@@ -14,7 +14,9 @@ using Serilog.Events;
 
 //TODO
 //
-//
+//OpenAI Quip
+//  PROMPT:
+//  generate a quip for me. A quip shouldn't exceed 200 characters, should be a single sentence, and should be shorter. The quip should be mildly insulting and or inappropriate. For example "sent that monkey to the zoo" or "gulag'd™". Now generate a quip.
 namespace BonkBot4
 {
     internal class Program
