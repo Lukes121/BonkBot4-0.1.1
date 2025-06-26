@@ -82,11 +82,21 @@ namespace BonkBot4.Modules
                 ///Message to server in taskQuip
                 var contextChannel = Context.Channel;
                 Quip quip = new Quip();
-                var taskQuip = quip.MakeQuipAsync(contextChannel);
+
+                //AIQuip Insert
+                AIQuip aiquip = new AIQuip();
+                aiquip.GetOpenAIAPIResponse();
+                var taskAIQuip = aiquip.MakeAIQuipAsync(contextChannel);
+
+                //commenting out to test aiquip
+                //var taskQuip = quip.MakeQuipAsync(contextChannel);
+
+
                 var taskMove = socketGuildUser.ModifyAsync(x =>
                 x.Channel = socketGuildChannel as SocketVoiceChannel);
 
-                await Task.WhenAll(taskQuip, taskMove);
+                //taskquip removed from below method, replaced with taskAIQuip for testing
+                await Task.WhenAll(taskAIQuip, taskMove);
             }
             else
                 return;

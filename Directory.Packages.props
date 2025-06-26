@@ -11,6 +11,7 @@
     <PackageVersion Include="Discord.Net.Core" Version="3.17.4" />
     <PackageVersion Include="Discord.Net.WebSocket" Version="3.17.4" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+    <PackageVersion Include="OpenAI" Version="2.1.0" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />

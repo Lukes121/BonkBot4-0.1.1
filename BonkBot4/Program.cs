@@ -17,32 +17,50 @@ using Serilog.Events;
 //OpenAI Quip
 //  PROMPT:
 //  generate a quip for me. A quip shouldn't exceed 200 characters, should be a single sentence, and should be shorter. The quip should be mildly insulting and or inappropriate. For example "sent that monkey to the zoo" or "gulag'd™". Now generate a quip.
+//DONE
+//      optimize aiquip; decide whether to have ai interaction module, or keep aiquip module
+//      Build ai interaction api for use in other programs
+
+//TODO
+//Cache ai quips somehow, and save all quips for use later to save money
+//sqlite?
+//EF Core for the luls?
+//json?
+//txt?
+
+//TODO
+//Message cleanup module
+//cleanup last x messages - by default only bot and caller
+
 namespace BonkBot4
 {
     internal class Program
     {
         static async Task Main()
         {
-            //New methods, and revised call stack for discord.net; microsoft.extensions.hosting; etc upgrades
 
             //Serilog configuration; requires Serilog, Serilog.Sinks.Console
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug() //consider changing this to 'information()'
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug) //was error
                 .WriteTo.Console()
                 .CreateLogger();
 
             //var config = new HostApplicationBuilderSettings()
             var builder = Host.CreateApplicationBuilder();
-            //Here is where we change the json file being used
+            //Here is where we change the json file being used. Otherwise default is appsettings.json
             builder.Configuration.AddJsonFile("appsettings.dev.json", optional: false, reloadOnChange: true);
             
             //add logging
             //requires serilog.extensions.hosting
             builder.Services.AddSerilog();
 
+            //add discord host
+            //requires discord.addons.hosting
             builder.Services.AddDiscordHost((config, _) =>
             {
+                //add socket client configuration
+                //requires discord.websocket
                 config.SocketConfig = new DiscordSocketConfig
                 {
                     LogLevel = Discord.LogSeverity.Verbose,
@@ -51,19 +69,20 @@ namespace BonkBot4
                     GatewayIntents = Discord.GatewayIntents.All //This is a new member of the discord API. Double check required intents configured in bot on discord
                 };
 
+                //Token taken from json file
                 config.Token = builder.Configuration["Token"]!;
 
                 //Use this to configure a custom format for Client/CommandService logging if needed. The default is below and should be suitable for Serilog usage
                 config.LogFormat = (message, exception) => $"{message.Source}: {message.Message}";
             });
-
+            //requires discord.addons.hosting; microsoft.extensions.dependencyinjection
             builder.Services.AddCommandService((config, _) =>
             {
                 config.DefaultRunMode = RunMode.Async;
                 config.CaseSensitiveCommands = false;
                 
             });
-
+            //requires discord.addons.hosting; microsoft.extensions.dependencyinjection
             builder.Services.AddInteractionService((config, _) =>
             {
                 config.LogLevel = Discord.LogSeverity.Verbose; //consider changing to .info

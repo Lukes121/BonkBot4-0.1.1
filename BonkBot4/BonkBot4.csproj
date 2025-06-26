@@ -16,6 +16,7 @@
     <PackageReference Include="Discord.Net.Core" />
     <PackageReference Include="Discord.Net.WebSocket" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="OpenAI" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Sinks.Console" />
